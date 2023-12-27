@@ -14,7 +14,8 @@ Bloxflip auto mine is bot that automatically plays bloxflip's mine game with the
 ### Features:
 - [x] - **Plays automatically**
 - [x] - **Very customizable**
-- [x] - **Display information about the current game** 
+- [x] - **Display information about the current game**
+- [x] - **Built in "predictor"**
 
 ## Preview:
 ![image](https://github.com/Aspectise/Bloxflip-auto-mine/assets/90333100/01cbb0eb-ddbb-490b-8364-cda848ade6e4)
