@@ -1,6 +1,7 @@
 # Bloxflip-auto-mine
 Bloxflip auto mine is bot that automatically plays bloxflip's mine game with the information you give it in config.json!
-
+## Next update at 15 ⭐
++ Auto towers
 ## Setup
 ```json
 {
