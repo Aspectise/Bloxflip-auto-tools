@@ -1,11 +1,14 @@
-from datetime import datetime
-import random
-import time
-import json
 import os
-import cloudscraper
-from rgbprint import gradient_print, Color, rgbprint
-
+try:
+    from datetime import datetime
+    import random
+    import time
+    import json
+    import cloudscraper
+    from rgbprint import gradient_print, Color, rgbprint
+except Exception as e:
+    os.system("pip install cloudscraper rgbprint")
+    
 # Bloxflip auto tools by Aspect | discord.gg/deathsniper
 os.system('cls' if os.name == 'nt' else 'clear')
 class Mines:
