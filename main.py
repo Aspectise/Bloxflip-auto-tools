@@ -7,8 +7,8 @@ try:
     import cloudscraper
     from rgbprint import gradient_print, Color, rgbprint
 except Exception as e:
-    os.system("pip install cloudscraper rgbprint")
-    
+    os.system("pip insall cloudscraper rgbprint")
+
 # Bloxflip auto tools by Aspect | discord.gg/deathsniper
 os.system('cls' if os.name == 'nt' else 'clear')
 class Mines:
@@ -213,28 +213,52 @@ class Towers:
         print(f"{Color(89, 39, 176)}STARTED{Color(255, 255, 255)} | Towers Game started! {Color(200, 200, 200)}({self.progress}/{game_amt}){Color(255, 255, 255)}")
         print(f"{Color(0, 150, 150)}GAME{Color(255, 255, 255)} | Round ID: {round_id}")
         print(f"{Color(0, 150, 150)}GAME{Color(255, 255, 255)} | Client Seed: {client_seed}")
-        tower = [[f'{Color(255, 255, 255)}X {Color(255, 255, 255)}', f'{Color(255, 255, 255)}X {Color(255, 255, 255)}', f'{Color(255, 255, 255)}X {Color(255, 255, 255)}'] for _ in range(8)]
-        count = 0
-        level = -1
-        exploded = False
-
-        for _ in range(self.click_amt):
-            while not exploded:
-                a = random.randint(0, 2)
-                level += 1
-                tower[count][a] = f'{Color(0, 255, 0)}O {Color(255, 255, 255)}'
-                choose_tile = self.scraper.post('https://api.bloxflip.com/games/towers/action', headers={'x-auth-token': self.auth}, json={'cashout': False, 'tile': a, 'towerLevel': level})
-                click_json = choose_tile.json()
-                if click_json["exploded"] == True:
-                    print(f"{Color(255, 50, 50)}UH OH{Color(255, 255, 255)} | Clicked a wrong tile..")
-                    exploded = True
+        if self.difficulty.lower() == "normal":
+            tower = [[f'{Color(255, 255, 255)}X {Color(255, 255, 255)}', f'{Color(255, 255, 255)}X {Color(255, 255, 255)}'] for _ in range(8)]
+            count = 0
+            level = -1
+            exploded = False
+    
+            for _ in range(self.click_amt):
+                while not exploded:
+                    a = random.randint(0, 1)
+                    level += 1
+                    tower[count][a] = f'{Color(0, 255, 0)}O {Color(255, 255, 255)}'
+                    choose_tile = self.scraper.post('https://api.bloxflip.com/games/towers/action', headers={'x-auth-token': self.auth}, json={'cashout': False, 'tile': a, 'towerLevel': level})
+                    click_json = choose_tile.json()
+                    if click_json["exploded"] == True:
+                        print(f"{Color(255, 50, 50)}UH OH{Color(255, 255, 255)} | Clicked a wrong tile..")
+                        exploded = True
+                        break
+                    count += 1
+                    print(f"{self.INFO} Clicked {count} times ({a})")
                     break
-                count += 1
-                print(f"{self.INFO} Clicked {count} times ({a})")
-                break
+                
+            print("\n".join("".join(row) for row in tower[::-1]))
+            time.sleep(0.2)
+        else:
+            tower = [[f'{Color(255, 255, 255)}X {Color(255, 255, 255)}', f'{Color(255, 255, 255)}X {Color(255, 255, 255)}', f'{Color(255, 255, 255)}X {Color(255, 255, 255)}'] for _ in range(8)]
+            count = 0
+            level = -1
+            exploded = False
 
-        print("\n".join("".join(row) for row in tower[::-1]))
-        time.sleep(0.2)
+            for _ in range(self.click_amt):
+                while not exploded:
+                    a = random.randint(0, 2)
+                    level += 1
+                    tower[count][a] = f'{Color(0, 255, 0)}O {Color(255, 255, 255)}'
+                    choose_tile = self.scraper.post('https://api.bloxflip.com/games/towers/action', headers={'x-auth-token': self.auth}, json={'cashout': False, 'tile': a, 'towerLevel': level})
+                    click_json = choose_tile.json()
+                    if click_json["exploded"] == True:
+                        print(f"{Color(255, 50, 50)}UH OH{Color(255, 255, 255)} | Clicked a wrong tile..")
+                        exploded = True
+                        break
+                    count += 1
+                    print(f"{self.INFO} Clicked {count} times ({a})")
+                    break
+
+            print("\n".join("".join(row) for row in tower[::-1]))
+            time.sleep(0.2)
         if exploded is not True:
             self.cashout()
         else:
