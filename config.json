@@ -1,7 +1,16 @@
 {
     "Token": "",
-    "Bet_Amount": 10,
-    "Mines_Amount": 3,
-    "Click_Amount": 2,
-    "Stop_Amount": 10
+
+    "Mines": {
+        "Bet_Amount": 10,
+        "Mines_Amount": 3,
+        "Click_Amount": 3,
+        "Stop_Amount": 350
+    },
+    "Towers": {
+        "Bet_Amount": 10,
+        "Difficulty": "easy",
+        "Click_Amount": 2,
+        "Stop_Amount": 350
+    }
 }
