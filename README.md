@@ -15,7 +15,7 @@ Bloxflip auto mine is bot that automatically plays bloxflip's mine game with the
     },
     "Towers": {
         "Bet_Amount": 10, Bet amount to set every game
-        "Difficulty": "easy", Difficulty to set every game
+        "Difficulty": "easy", Difficulty to set every game (easy, normal, hard)
         "Click_Amount": 2, Will click the amount of time you enter before trying to cash out
         "Stop_Amount": 350 Will stop playing if your bloxflip balance hit or goes under the amount you enter
     }
