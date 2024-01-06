@@ -2,6 +2,7 @@
 Bloxflip auto tools is a bloxflip bot that automatically plays bloxflip's Mines and Towers game modes with the information you give it in config.json!
 ## Next update at 20 ⭐
 + Safe predictions
++ Unrigger
 ## Setup
 ```json
 {
