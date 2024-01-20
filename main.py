@@ -7,7 +7,7 @@ try:
     import cloudscraper
     from rgbprint import gradient_print, Color, rgbprint
 except Exception as e:
-    os.system("pip insall cloudscraper rgbprint")
+    os.system("pip install cloudscraper rgbprint")
 
 # Bloxflip auto tools by Aspect | discord.gg/deathsniper
 os.system('cls' if os.name == 'nt' else 'clear')
