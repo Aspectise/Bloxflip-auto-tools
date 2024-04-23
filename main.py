@@ -7,10 +7,11 @@ try:
     import cloudscraper
     from rgbprint import gradient_print, Color, rgbprint
 except Exception as e:
-    os.system("pip install cloudscraper rgbprint")
+    os.system("pip insall cloudscraper rgbprint")
 
 # Bloxflip auto tools by Aspect | discord.gg/deathsniper
 os.system('cls' if os.name == 'nt' else 'clear')
+load_config = json.load(open("config.json", "r"))
 class Mines:
     def __init__(self, auth, bet_amt, bomb_amt, click_amt, stop_amt):
         self.auth = auth
@@ -27,6 +28,7 @@ class Mines:
         self.scraper = cloudscraper.create_scraper()
 
     def get_balance(self):
+        print(f"{self.INFO} Checking Token...")
         request = self.scraper.get("https://api.bloxflip.com/user", headers={"x-auth-token": self.auth}).json()
         if "user" not in request:
             input(f"{self.ERROR} Invalid Token. Enter to exit...")
@@ -40,7 +42,17 @@ class Mines:
             os._exit(0)
         return request["user"]["robloxUsername"]
 
-    def start_game(self):
+    def start_games(self):
+        if load_config["Mines"]["Safe_Prediction"]:
+            for game_index in range(1, game_amt + 1):
+                print(f"{'-' * 5} Game {game_index} {'-' * 5}")
+                self.play_round_safe()
+        else:
+            for game_index in range(1, game_amt + 1):
+                print(f"{'-' * 5} Game {game_index} {'-' * 5}")
+                self.play_round()
+
+    def main(self):
         global game_amt
         while True:
             game_amt_input = input(f'{Color(0, 128, 255)}INPUT{Color(255, 255, 255)} | How many games do you want to play: ')
@@ -49,31 +61,79 @@ class Mines:
                 break
             else:
                 print(f"{self.ERROR} Please enter a valid number.")
+
         os.system('cls' if os.name == 'nt' else 'clear')
-        print(f"{self.INFO} Checking Token...")
         self.get_balance()
         os.system('cls' if os.name == 'nt' else 'clear')
+
         orig_balance = "{:.2f}".format(self.get_balance())
         username = self.get_username()
+
         print(f"{self.INFO} Logged in as {username} / Balance: {orig_balance}$")
         print(f"{self.INFO} Starting game...\n")
         self.progress = 0
-        for game_index in range(1, game_amt + 1):
-            print(f"{'-' * 5} Game {game_index} {'-' * 5}")
-            self.play_round()
-        time.sleep(1)
+
+        self.start_games()
+
         final_balance = "{:.2f}".format(self.get_balance())
         print(f"{Color(0, 150, 150)}GAME{Color(255, 255, 255)} Done with all games")
+
         print(f"{self.INFO} Starting Balance: {orig_balance}$")
         print(f"{self.INFO} New Balance: {final_balance}$\n")
         y_n = input(f"{Color(0, 128, 255)}INPUT{Color(255, 255, 255)} | Do you want to run again? (y/n): ").lower()
         if y_n == "y" or y_n == "yes":
             os.system('cls' if os.name == 'nt' else 'clear')
-            self.start_game()
+            self.start_games()
+
         elif y_n == "n" or y_n == "no":
             print(f"{Color(255, 165, 0)}CYA{Color(255, 255, 255)} | Closing in 5s...")
             time.sleep(5)
             os._exit(0)
+
+    def play_round_safe(self):
+        start_game = self.scraper.post("https://api.bloxflip.com/games/mines/create",headers={"x-auth-token": self.auth},json={"betAmount": self.bet_amt, "mines": self.bomb_amt},)
+        if start_game.status_code == 400 and start_game.json()["msg"] == "You already have an active mines game!":
+            input(f"{self.ERROR} You have an active mines game already. Enter to exit...")
+            os._exit(0)
+        elif start_game.status_code != 200:
+            input(f"{self.ERROR} Unknown error occurred, try again. Enter to exit...")
+            os._exit(0)
+        round_id = start_game.json()["game"]["uuid"]
+        client_seed = start_game.json()["game"]["clientSeed"]
+        self.progress += 1
+        print(f"{Color(89, 39, 176)}STARTED{Color(255, 255, 255)} | Mines Game started! {Color(200, 200, 200)}({self.progress}/{game_amt}){Color(255, 255, 255)}")
+        print(f"{Color(0, 150, 150)}GAME{Color(255, 255, 255)} | Round ID: {round_id}")
+        print(f"{Color(0, 150, 150)}GAME{Color(255, 255, 255)} | Client Seed: {client_seed}")
+        mines = [f"{Color(255, 255, 255)}X {Color(255, 255, 255)}" for _ in range(25)]
+        count = 0
+        clicked_positions = set()
+        exploded = False
+        
+        mines_to_click = [10, 15]
+
+        for mine_position in mines_to_click:
+            while not exploded:
+                if mine_position not in clicked_positions:
+                    mines[mine_position] = f"{Color(0, 255, 0)}O {Color(255, 255, 255)}"
+                    clicked_positions.add(mine_position)
+                    choose_mine = self.scraper.post('https://api.bloxflip.com/games/mines/action', headers={'x-auth-token': self.auth}, json={'cashout': False, 'mine': mine_position})
+                    click_json = choose_mine.json()
+                    if click_json["exploded"] == True:
+                        print(f"{Color(255, 50, 50)}UH OH{Color(255, 255, 255)} | Clicked a mine at position {mine_position}..")
+                        exploded = True
+                        break
+                    count += 1
+                    print(f"{self.INFO} Clicked {count} times ({mine_position + 1})")
+                    break
+        print("\n".join(["".join(mines[i:i + 5]) for i in range(0, 25, 5)]))
+        time.sleep(0.2)
+        if exploded is not True:
+            self.cashout()
+        else:
+            balance = self.get_balance()
+            balance = "{:.2f}".format(balance)
+            print(f"{self.LOST} You lost / Balance: {balance}$\n")
+            Unrigger(self.auth, self.scraper).unrig()
 
     def play_round(self):
         start_game = self.scraper.post("https://api.bloxflip.com/games/mines/create",headers={"x-auth-token": self.auth},json={"betAmount": self.bet_amt, "mines": self.bomb_amt},)
@@ -117,6 +177,7 @@ class Mines:
             balance = self.get_balance()
             balance = "{:.2f}".format(balance)
             print(f"{self.LOST} You lost / Balance: {balance}$\n")
+            Unrigger(self.auth, self.scraper).unrig()
 
     def cashout(self):
         try:
@@ -152,6 +213,7 @@ class Towers:
         self.scraper = cloudscraper.create_scraper()
 
     def get_balance(self):
+        print(f"{self.INFO} Checking Token...")
         request = self.scraper.get("https://api.bloxflip.com/user", headers={"x-auth-token": self.auth}).json()
         if "user" not in request:
             input(f"{self.ERROR} Invalid Token. Enter to exit...")
@@ -165,7 +227,12 @@ class Towers:
             os._exit(0)
         return request["user"]["robloxUsername"]
 
-    def start_game(self):
+    def start_games(self):
+        for game_index in range(1, game_amt + 1):
+            print(f"{'-' * 5} Game {game_index} {'-' * 5}")
+            self.play_round()
+
+    def main(self):
         global game_amt
         while True:
             game_amt_input = input(f'{Color(0, 128, 255)}INPUT{Color(255, 255, 255)} | How many games do you want to play: ')
@@ -174,26 +241,31 @@ class Towers:
                 break
             else:
                 print(f"{self.ERROR} Please enter a valid number.")
+
         os.system('cls' if os.name == 'nt' else 'clear')
-        print(f"{self.INFO} Checking Token...")
         self.get_balance()
         os.system('cls' if os.name == 'nt' else 'clear')
+
         orig_balance = "{:.2f}".format(self.get_balance())
         username = self.get_username()
+
         print(f"{self.INFO} Logged in as {username} / Balance: {orig_balance}$")
         print(f"{self.INFO} Starting game...\n")
+
         self.progress = 0
-        for game_index in range(1, game_amt + 1):
-            print(f"{'-' * 5} Game {game_index} {'-' * 5}")
-            self.play_round()
+
+        self.start_games()
+
         final_balance = "{:.2f}".format(self.get_balance())
+
         print(f"{Color(0, 150, 150)}GAME{Color(255, 255, 255)} | Done with all games")
         print(f"{self.INFO} Starting Balance: {orig_balance}$")
         print(f"{self.INFO} New Balance: {final_balance}$\n")
         y_n = input(f"{Color(0, 128, 255)}INPUT{Color(255, 255, 255)} | Do you want to run again? (y/n): ").lower()
         if y_n == "y" or y_n == "yes":
             os.system('cls' if os.name == 'nt' else 'clear')
-            self.start_game()
+            self.start_games()
+
         elif y_n == "n" or y_n == "no":
             print(f"{Color(255, 165, 0)}CYA{Color(255, 255, 255)} | Closing in 5s...")
             time.sleep(5)
@@ -265,6 +337,7 @@ class Towers:
             balance = self.get_balance()
             balance = "{:.2f}".format(balance)
             print(f"{self.LOST} You lost / Balance: {balance}$\n")
+            Unrigger(self.auth, self.scraper).unrig()
 
     def cashout(self):
         try:
@@ -285,7 +358,6 @@ class Towers:
             os._exit(0)
 
 def main():
-    load_config = json.load(open("config.json", "r"))
     while True:
         gamemode = input(f"{Color(0, 128, 255)}INPUT{Color(255, 255, 255)} | What Game Mode do you want to play (1 = Mines | 2 = Towers): ")
         if gamemode.isdigit() and float(gamemode) == int(gamemode) and gamemode in ['1', '2']:
@@ -326,7 +398,7 @@ def main():
             os._exit(0)
         os.system("title Bloxflip auto mines by Aspectise ~ discord.gg/deathsniper")
         game = Mines(auth_token, bet_amount, mines_amount, click_amount, stop_amount)
-        game.start_game()
+        game.main()
     
     if int(gamemode) == 2:
         bet_amount = load_config["Towers"]["Bet_Amount"]
@@ -353,7 +425,59 @@ def main():
             os._exit(0)
         os.system("title Bloxflip auto towers by Aspectise ~ discord.gg/deathsniper")
         game = Towers(auth_token, bet_amount, difficulty, click_amount, stop_amount)
-        game.start_game()
+        game.main()
+
+class Unrigger:
+    API_BASE_URL = "https://api.bloxflip.com"
+
+    def __init__(self, auth, session):
+        self.scraper = session
+        self.auth = auth
+
+    def _make_request(self, method, endpoint, headers=None, data=None):
+        url = f"{self.API_BASE_URL}{endpoint}"
+        headers = headers or {}
+        headers["x-auth-token"] = self.auth
+
+        response = method(url, headers=headers, data=data)
+
+        if response.status_code != 200:
+            print(f"{Color(255, 0, 0)}ERROR{Color(255, 255, 255)} | An error has occurred while trying to unrig.")
+            return None
+
+        return response.json()
+
+    def _get_server_hash(self):
+        endpoint = "/provably-fair"
+        response_data = self._make_request(self.scraper.get, endpoint)
+        return response_data.get("serverHash")
+
+    def _get_client_seed(self):
+        endpoint = "/games/mines/history?size=5000&page=0"
+        response_data = self._make_request(self.scraper.get, endpoint)
+        seed_json = response_data.get("data", [])
+        get_seeds = [item["serverSeed"][:32] for item in seed_json if not item["exploded"]]
+        return get_seeds[0] if get_seeds else None
+
+    def _post_new_seed(self, client_seed):
+        endpoint = "/provably-fair/clientSeed"
+        data = {"clientSeed": client_seed}
+        headers = {"Content-Type": "application/json"}
+        response_data = self._make_request(self.scraper.post, endpoint, headers=headers, data=json.dumps(data))
+
+        if response_data:
+            print(f"{Color(127, 127, 127)}INFO{Color(255, 255, 255)} | You have been unrigged!")
+        else:
+            print(f"{Color(255, 0, 0)}ERROR{Color(255, 255, 255)} | An error has occurred while trying to unrig.")
+
+    def unrig(self):
+        server_hash = self._get_server_hash()
+        if server_hash:
+            client_seed = self._get_client_seed()
+            if client_seed:
+                self._post_new_seed(client_seed)
+            else:
+                print(f"{Color(255, 0, 0)}ERROR{Color(255, 255, 255)} | You need to be on a valid gamemode to unrig.")
 
 
 if __name__ == "__main__":
