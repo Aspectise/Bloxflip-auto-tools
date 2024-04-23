@@ -4,6 +4,7 @@
     "Mines": {
         "Bet_Amount": 10,
         "Mines_Amount": 3,
+        "Safe_Prediction": false,
         "Click_Amount": 3,
         "Stop_Amount": 350
     },
