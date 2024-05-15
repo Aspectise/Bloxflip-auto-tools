@@ -1,17 +1,19 @@
 {
     "Token": "",
-
+    
+    "Bet_Amount": 5,
+    "Click_Amount": 1,
+    "Stop_Amount": 100,
+    
     "Mines": {
-        "Bet_Amount": 10,
         "Mines_Amount": 3,
-        "Safe_Prediction": false,
-        "Click_Amount": 3,
-        "Stop_Amount": 350
+        "Safe_Prediction": false
     },
     "Towers": {
-        "Bet_Amount": 10,
+        "Difficulty": "easy"
+    },
+    "Plinko": {
         "Difficulty": "easy",
-        "Click_Amount": 2,
-        "Stop_Amount": 350
+        "Row": 8
     }
 }
