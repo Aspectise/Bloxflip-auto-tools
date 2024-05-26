@@ -3,6 +3,7 @@ Bloxflip auto tools is the best free bloxflip bot that automatically plays a var
 ## Next update at 50 ⭐
 + Better crash prediction
 + Stop amount for crash
++ Support for slides game mode
 
 ### Features:
 - [x] - **Open Source**
