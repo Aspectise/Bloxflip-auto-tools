@@ -1,18 +1,25 @@
 # Bloxflip-auto-tools
-Bloxflip auto tools is a bloxflip bot that automatically plays a variety of bloxflip game modes (Mines, Towers, Plinko)!
-## Next update at 40 ⭐
-+ Supports for crash game mode using artificial neural network
+Bloxflip auto tools is the best free bloxflip bot that automatically plays a variety of bloxflip game modes (Mines, Towers, Plinko, Crash)!
+## Next update at 50 ⭐
++ Better crash prediction
++ Stop amount for crash
 
 ### Features:
 - [x] - **Open Source**
+- [x] - **Free**
 - [x] - **Well Managed**
-- [x] - **Supported Game-Modes: Mines, Towers, Plinko**
+- [x] - **Supported Game-Modes: Mines, Towers, Plinko, Crash**
 - [x] - **Plays Automatically**
 - [x] - **Very Customizable**
 - [x] - **Display information about the current games**
 - [x] - **Built in "predictor" for mines**
+- [x] - **Using artificial neural network for crash prediction**
 
 ## Setup
+1. Install python from python.org
+2. Open config.json and setup your stuff (every section is documented in red in the code block under this)
+3. Open start.bat or main.py
+4. Enjoy
 ```json
 {
     "Token": "", Your bloxflip account token, you get it by opening inspect (right click) and going to console then typing "copy(localStorage.getItem('_DO_NOT_SHARE_BLOXFLIP_TOKEN'))", your token has been copied to your clipboard
