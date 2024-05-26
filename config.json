@@ -15,7 +15,7 @@
     "Plinko": {
         "Difficulty": "easy",
         "Row": 8
-    }
+    },
     "Crash": {
         "Auto_Cashout": 1.5,
         "ANN": {
