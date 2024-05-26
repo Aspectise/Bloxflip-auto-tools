@@ -38,6 +38,13 @@ Bloxflip auto tools is the best free bloxflip bot that automatically plays a var
     "Plinko": {
         "Difficulty": "easy", Difficulty level (easy/normal/hard)
         "Row": 8 Amount of plinko rows
+    },
+    "Crash": {
+        "Auto_Cashout": 1.5, Crash point to cash out at
+        "ANN": {
+            "Enabled": false, If true will use artificial neural network to predicit the next crash game (NOTICE: remember that predictions are not 100% correct)
+            "Model": "random_forest" Model to use for predicition, available models: random_forest, linear, svr
+        }
     }
 }
 
