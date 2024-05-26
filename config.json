@@ -16,4 +16,11 @@
         "Difficulty": "easy",
         "Row": 8
     }
+    "Crash": {
+        "Auto_Cashout": 1.5,
+        "ANN": {
+            "Enabled": false,
+            "Model": "random_forest"
+        }
+    }
 }
