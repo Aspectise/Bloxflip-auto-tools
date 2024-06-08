@@ -1,5 +1,5 @@
 # Bloxflip-auto-tools
-Bloxflip auto tools is the best free bloxflip bot that automatically plays a variety of bloxflip game modes (Mines, Towers, Plinko, Crash)!
+Bloxflip auto tools is the best free bloxflip bot that automatically plays a variety of bloxflip game modes (Mines, Towers, Plinko, Crash, Slides)!
 ## Next update at 55 ⭐
 + Algorithm for slides
 
@@ -7,7 +7,7 @@ Bloxflip auto tools is the best free bloxflip bot that automatically plays a var
 - [x] - **Open Source**
 - [x] - **Free**
 - [x] - **Well Managed**
-- [x] - **Supported Game-Modes: Mines, Towers, Plinko, Crash**
+- [x] - **Supported Game-Modes: Mines, Towers, Plinko, Crash, Slides**
 - [x] - **Plays Automatically**
 - [x] - **Very Customizable**
 - [x] - **Display information about the current games**
