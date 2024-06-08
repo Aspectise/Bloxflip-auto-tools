@@ -16,7 +16,7 @@ def get_points():
             with session.get("https://api.bloxflip.com/games/crash") as response:
                 response.raise_for_status()
                 data = response.json()
-                crash_points = [point["crashPoint"] for point in data["history"][:20]]  # Use more data points
+                crash_points = [point["crashPoint"] for point in data["history"][:20]]
                 return crash_points
     except requests.RequestException as e:
         cprint.error(f"Failed to get crash points: {e}")
@@ -27,9 +27,9 @@ def prepare_data(crash_points):
     df['Time Step'] = range(len(df))
     df['Lagged_1'] = df['Crash Point'].shift(1).bfill()
     df['Lagged_2'] = df['Crash Point'].shift(2).bfill()
-    df['Lagged_3'] = df['Crash Point'].shift(3).bfill()  # Additional lagged feature
+    df['Lagged_3'] = df['Crash Point'].shift(3).bfill()
     df['Rolling_Mean_3'] = df['Crash Point'].rolling(window=3, center=True).mean().bfill()
-    df['Rolling_Mean_5'] = df['Crash Point'].rolling(window=5, center=True).mean().bfill()  # Another rolling mean
+    df['Rolling_Mean_5'] = df['Crash Point'].rolling(window=5, center=True).mean().bfill()
 
     df.fillna(method='bfill', inplace=True)
     df.fillna(method='ffill', inplace=True)

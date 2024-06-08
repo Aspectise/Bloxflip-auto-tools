@@ -1,19 +1,18 @@
 from websocket import WebSocketApp
 import threading
 import json
-import asyncio
 from src import cprint
-from functions import predict
+import random
 import requests
 
-class Crash:
+class Slides:
     def __init__(self, client, session) -> None:
         self.client = client
         self.joined_game = False
         self.close_conn = False
         self.game_played = 0
-        self.wallet = None
         self.session = session
+        self.wallet = None
         self.stop_event = threading.Event()
 
     def connect(self):
@@ -29,54 +28,54 @@ class Crash:
     def on_message(self, ws, msg):
         if "pingInterval" in msg:
             threading.Thread(target=self.keep_alive, args=(ws, json.loads(msg.replace("0", ""))["pingInterval"])).start()
-            ws.send("40/crash,")
+            ws.send("40/rouletteV2,")
 
         if "notify-error" in msg:
-            data = json.loads(msg.replace("42/crash,", ""))
+            data = json.loads(msg.replace("42/rouletteV2,", ""))
             if data[1] == "Your session has expired, please refresh your page!":
                 cprint.error("Token is invalid")
             self.close_conn = True
             self.stop_event.set()
             ws.close()
 
-        if "40/crash" in msg:
-            ws.send('42/crash,["auth","' + self.client.token + '"]')
+        if "40/rouletteV2" in msg:
+            ws.send('42/rouletteV2,["auth","' + self.client.token + '"]')
 
-        if "\"game-starting\"" in msg:
+        if "\"new-round\"" in msg:
             if self.game_played == self.client.game_amount or (self.wallet and float(self.wallet) <= float(self.client.stop_amt)):
                 self.close_conn = True
                 self.stop_event.set()
                 ws.close()
             else:
-                cprint.info("Crash game is starting...")
-                if not self.client.ann_enabled:
-                    self.cashout_point = self.client.auto_cashout
-                else:
-                    self.cashout_point = predict.start(self.client.crash_model)
-                    self.cashout_point = float(f"{self.cashout_point:.2f}")
-                    cprint.info(f"Next game prediction: {self.cashout_point}x")
-                ws.send('42/crash,["join-game",{"autoCashoutPoint":' + str(int(self.cashout_point * 100)) + ', "betAmount":' + str(self.client.bet_amt) + '}]')
-
-        if "\"game-start\"" in msg:
-            cprint.info("Crash game in-progress...")
+                cprint.info("Slides game is starting...")
+                self.chosen_color = random.choice(["purple", "red"])
+                cprint.info(f"Next game prediction: {self.chosen_color}.")
+                ws.send(f'42/rouletteV2,{json.dumps(["join-game", {"color": self.chosen_color, "betAmount": self.client.bet_amt}])}')
 
         if "game-join-success" in msg:
-            cprint.custom(f"Joined the current crash game on {self.cashout_point}x!", "SUCCESS", (0,255,0))
+            cprint.custom(f"Joined the current slides game on {self.chosen_color}!", "SUCCESS", (0,255,0))
             self.game_played += 1
             self.joined_game = True
 
-        if "game-end" in msg:
-            cprint.info("Crash game ended.")
-            if self.joined_game:
-                data = json.loads(msg.replace("42/crash,", ""))[1]
-                self.wallet = self.get_wallet()
-                if data.get("crashPoint") < self.cashout_point:
-                    cprint.lost(f"Ended at {data.get('crashPoint')}x and was going for {self.cashout_point}x..\n")
+        if "game-rolled" in msg:
+            try:
+                cprint.info("Slides game ended.")
+                if self.joined_game:
+                    data = json.loads(msg.replace("42/rouletteV2,", ""))[1]
+                    wincolor = data["winningColor"]
+
+                    self.wallet = self.get_wallet()
+
+                    if self.chosen_color != wincolor:
+                        cprint.lost(f"Predicted {self.chosen_color} and was {wincolor}..")
+                    else:
+                        gained = self.client.bet_amt * 2
+                        cprint.won(f"Prediction correct ({self.chosen_color})! Got {gained:.2f} R$!\n")
                 else:
-                    gained = self.client.bet_amt * self.cashout_point
-                    cprint.won(f"Cashed out at {self.cashout_point}x and ended at {data.get('crashPoint')}x. You made {gained:.2f} R$!\n")
-            else:
-                cprint.info("Did not join this crash game.\n")
+                    cprint.info("Did not join this slides game.\n")
+            except:
+                import traceback
+                traceback.print_exc()
 
     def get_wallet(self):
         with requests.Session() as session:
@@ -94,4 +93,4 @@ class Crash:
             self.stop_event.wait(interval)
 
     def on_open(self, _):
-        cprint.info("Connected to crash game mode!\n")
+        cprint.info("Connected to slides game mode!\n")

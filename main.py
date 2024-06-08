@@ -5,7 +5,8 @@ import os
 import traceback
 
 from src import cprint
-from modes import mines, towers, plinko, crash
+from modes import mines, towers, plinko, crash, slides
+
 settings = json.load(open("config.json", "r"))
 class Main:
     def __init__(self):
@@ -21,8 +22,8 @@ class Main:
         cprint.info(f"Logged in as {self.username} / Balance: {self.wallet:.2f} R$\n")
 
         while True:
-            self.game_mode = cprint.user_input("What game mode do you want to play? (towers/mines/plinko/crash) > ").lower()
-            if self.game_mode in ["towers", "mines", "plinko", "crash"]:
+            self.game_mode = cprint.user_input("What game mode do you want to play? (towers/mines/plinko/crash/slides) > ").lower()
+            if self.game_mode in ["towers", "mines", "plinko", "crash", "slides"]:
                 break
             else:
                 cprint.error("Invalid game mode.")
@@ -69,7 +70,7 @@ class Main:
             ("Auto_Cashout", self.auto_cashout),
             ("Crash_Model", self.crash_model),
         ]:
-            if setting not in ["Difficulty", "Auto_Cashout", "Crash_Model"] and not isinstance(value, int) and self.game_mode != "crash":
+            if setting not in ["Difficulty", "Auto_Cashout", "Crash_Model"] and not isinstance(value, int) and self.game_mode not in ["crash", "slides"]:
                 error_messages.append(cprint.error(f"{setting} must be a valid number."))
 
             if setting == "Crash_Model" and self.crash_model not in ["random_forest", "linear", "svr"]:
@@ -84,7 +85,7 @@ class Main:
             if setting == "Difficulty" and value not in ["easy","normal","hard"]:
                 error_messages.append(cprint.error(f"{setting} is invalid."))
 
-            if setting == "Bet_Amount" and value < 5 and self.game_mode not in ["plinko", "crash"]:
+            if setting == "Bet_Amount" and value < 5 and self.game_mode not in ["plinko", "crash", "slides"]:
                 error_messages.append(cprint.error(f"{setting} can not be less then 5."))
 
         if error_messages:
@@ -115,7 +116,9 @@ class Main:
                 if self.game_mode == "plinko":
                     await plinko.start(self, session)
                 if self.game_mode == "crash":
-                    crash.Crash(self).connect()
+                    crash.Crash(self, session).connect()
+                if self.game_mode == "slides":
+                    slides.Slides(self, session).connect()
 
                 while True:
                     choice = cprint.user_input("Done with all games, do you want to re-run? (y/N) > ").lower()
@@ -125,8 +128,8 @@ class Main:
                 if choice == 'y':
                     while True:
                         os.system('cls' if os.name == 'nt' else 'clear')
-                        self.game_mode = cprint.user_input("What game mode do you want to play? (towers/mines/plinko/crash) > ").lower()
-                        if self.game_mode in ["towers", "mines", "plinko", "crash"]:
+                        self.game_mode = cprint.user_input("What game mode do you want to play? (towers/mines/plinko/crash/slides) > ").lower()
+                        if self.game_mode in ["towers", "mines", "plinko", "crash", "slides"]:
                             break
                         else:
                             cprint.error("Invalid game mode.")
