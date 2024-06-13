@@ -1,24 +1,24 @@
-import aiohttp
-import asyncio
 import json
 import os
 import traceback
-
+import cloudscraper
 from src import cprint
-from modes import mines, towers, plinko, crash, slides
+from modes import crash, mines, plinko, slides, towers
 
 settings = json.load(open("config.json", "r"))
 class Main:
     def __init__(self):
         os.system('cls' if os.name == 'nt' else 'clear')
         self.token = settings.get("Token")
+        self.session = cloudscraper.CloudScraper()
+        self.session.headers.update({"x-auth-token": self.token})
         if not self.token:
             cprint.error("Token not found. Please add your token in the config file.")
             os.system("pause")
             os._exit(0)
 
         cprint.info("Checking Token...")
-        self.wallet, self.username = asyncio.run(self.verify_token())
+        self.wallet, self.username = self.verify_token(self.session)
         cprint.info(f"Logged in as {self.username} / Balance: {self.wallet:.2f} R$\n")
 
         while True:
@@ -31,18 +31,17 @@ class Main:
         self.setup()
         self.game_amount = int(cprint.user_input("How many games do you want to play? > "))
 
-    async def verify_token(self):
-        async with aiohttp.ClientSession(headers={"x-auth-token": self.token}) as session:
-            async with session.get("https://api.bloxflip.com/user") as response:
-                if response.status == 200:
-                    data = await response.json()
-                    wallet = data.get("user").get("wallet") + data.get("user").get("bonusWallet")
-                    username = data.get("user").get("robloxUsername")
-                    return wallet, username
-                else:
-                    cprint.error(f"Invalid Token.")
-                    os.system("pause")
-                    os._exit(0)
+    def verify_token(self, session):
+        response = session.get("https://api.bloxflip.com/user")
+        if response.status_code == 200:
+            data = response.json()
+            wallet = data.get("user").get("wallet") + data.get("user").get("bonusWallet")
+            username = data.get("user").get("robloxUsername")
+            return wallet, username
+        else:
+            cprint.error(f"Invalid Token.")
+            os.system("pause")
+            os._exit(0)
 
     def setup(self):
         self.bet_amt = settings.get("Bet_Amount")
@@ -92,14 +91,13 @@ class Main:
             os.system("pause")
             os._exit(0)
     
-    async def run(self):
+    def run(self):
         while True:
             try:
                 self.lost_streak = 0
                 self.win_streak = 0
 
                 os.system('cls' if os.name == 'nt' else 'clear')
-                session = aiohttp.ClientSession(headers={"x-auth-token": self.token})
                 if self.game_mode in ["mines", "towers"] and self.bet_amt < 5:
                     while self.bet_amt < 5:
                         try:
@@ -109,16 +107,16 @@ class Main:
 
                 if self.game_mode == "mines":
                     for _ in range(self.game_amount):
-                        await mines.start(self, session)
+                        mines.start(self, self.session)
                 if self.game_mode == "towers":
                     for _ in range(self.game_amount):
-                        await towers.start(self, session)
+                        towers.start(self, self.session)
                 if self.game_mode == "plinko":
-                    await plinko.start(self, session)
+                    plinko.start(self, self.session)
                 if self.game_mode == "crash":
-                    crash.Crash(self, session).connect()
+                    crash.Crash(self, self.session).connect()
                 if self.game_mode == "slides":
-                    slides.Slides(self, session).connect()
+                    slides.Slides(self, self.session).connect()
 
                 while True:
                     choice = cprint.user_input("Done with all games, do you want to re-run? (y/N) > ").lower()
@@ -141,10 +139,8 @@ class Main:
             except Exception:
                 traceback.print_exc()
                 break
-            finally:
-                await session.close()
 
 if __name__ == "__main__":
     main = Main()
-    asyncio.run(main.run())
+    main.run()
 

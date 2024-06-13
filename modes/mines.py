@@ -4,8 +4,8 @@ from rgbprint import Color
 from src import cprint
 from functions import click, create, _continue
 
-async def start(self, session):
-    data = await create.start(session, "mines", {"betAmount": self.bet_amt, "mines": self.bomb_amt})
+def start(self, session):
+    data = create.start(session, "mines", {"betAmount": self.bet_amt, "mines": self.bomb_amt})
     if data:
         cprint.custom("Mines Game started!", "STARTED", (89, 39, 176))
 
@@ -36,16 +36,16 @@ async def start(self, session):
                 mines[_click] = f"{Color(0, 255, 0)}O {Color(255, 255, 255)}"
                 count += 1
                 clicked_positions.add(_click)
-                click_data = await click.start(session, "mines", {'cashout': False, 'mine': _click})
+                click_data = click.start(session, "mines", {'cashout': False, 'mine': _click})
 
                 if click_data.get("exploded"):
                     cprint.lost(f"Clicked a mine..")
                     lost = True
-                    await _continue._next(self, session, mines, True)
+                    _continue._next(self, session, mines, True)
                     break
 
                 cprint.info(f"Clicked {count} times ({_click+1})")
 
         if not lost:
-            await _continue._next(self, session, mines)
+            _continue._next(self, session, mines)
 

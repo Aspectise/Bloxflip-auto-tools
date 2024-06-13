@@ -1,10 +1,8 @@
 from websocket import WebSocketApp
 import threading
 import json
-import asyncio
 from src import cprint
-from functions import predict
-import requests
+from functions import predict, balance
 
 class Crash:
     def __init__(self, client, session) -> None:
@@ -17,14 +15,17 @@ class Crash:
         self.stop_event = threading.Event()
 
     def connect(self):
-        while True:
-            if self.close_conn:
-                break
-            try:
-                wsa = WebSocketApp("wss://ws.bloxflip.com/socket.io/?EIO=3&transport=websocket", header={'Accept-Encoding': 'gzip, deflate, br','Cache-Control': 'no-cache','Connection': 'Upgrade','Pragma': 'no-cache','Upgrade': 'websocket'}, on_open=self.on_open, on_message=self.on_message)
-                wsa.run_forever()
-            except Exception as e:
-                cprint.error(f"WebSocket connection error: {e}")
+        try:
+            while True:
+                if self.close_conn:
+                    break
+                try:
+                    wsa = WebSocketApp("wss://ws.bloxflip.com/socket.io/?EIO=3&transport=websocket", header={'Accept-Encoding': 'gzip, deflate, br','Cache-Control': 'no-cache','Connection': 'Upgrade','Pragma': 'no-cache','Upgrade': 'websocket'}, on_open=self.on_open, on_message=self.on_message)
+                    wsa.run_forever()
+                except Exception as e:
+                    cprint.error(f"WebSocket connection error: {e}")
+        except Exception as e:
+            print(e)
 
     def on_message(self, ws, msg):
         if "pingInterval" in msg:
@@ -52,7 +53,7 @@ class Crash:
                 if not self.client.ann_enabled:
                     self.cashout_point = self.client.auto_cashout
                 else:
-                    self.cashout_point = predict.start(self.client.crash_model)
+                    self.cashout_point = predict.crash(self.client.crash_model)
                     self.cashout_point = float(f"{self.cashout_point:.2f}")
                     cprint.info(f"Next game prediction: {self.cashout_point}x")
                 ws.send('42/crash,["join-game",{"autoCashoutPoint":' + str(int(self.cashout_point * 100)) + ', "betAmount":' + str(self.client.bet_amt) + '}]')
@@ -69,7 +70,7 @@ class Crash:
             cprint.info("Crash game ended.")
             if self.joined_game:
                 data = json.loads(msg.replace("42/crash,", ""))[1]
-                self.wallet = self.get_wallet()
+                self.wallet = balance.get(self.session)
                 if data.get("crashPoint") < self.cashout_point:
                     cprint.lost(f"Ended at {data.get('crashPoint')}x and was going for {self.cashout_point}x..\n")
                 else:
@@ -78,15 +79,6 @@ class Crash:
             else:
                 cprint.info("Did not join this crash game.\n")
 
-    def get_wallet(self):
-        with requests.Session() as session:
-            with session.get("https://api.bloxflip.com/user", headers={"x-auth-token": self.client.token}) as response:
-                if response.status_code == 200:
-                    data = response.json()
-                    return data.get("user").get("wallet") + data.get("user").get("bonusWallet")
-                else:
-                    cprint.error(f"Failed to get wallet: {response.status_code}")
-                    return 0
 
     def keep_alive(self, ws, interval):
         while not self.stop_event.is_set():

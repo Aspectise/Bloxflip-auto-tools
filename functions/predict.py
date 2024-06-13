@@ -5,6 +5,7 @@ from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split, GridSearchCV
 import requests
+import cloudscraper
 import numpy as np
 import warnings
 from src import cprint
@@ -12,12 +13,12 @@ warnings.filterwarnings("ignore")
 
 def get_points():
     try:
-        with requests.Session() as session:
-            with session.get("https://api.bloxflip.com/games/crash") as response:
-                response.raise_for_status()
-                data = response.json()
-                crash_points = [point["crashPoint"] for point in data["history"][:20]]
-                return crash_points
+        scraper = cloudscraper.CloudScraper()
+        response = scraper.get("https://api.bloxflip.com/games/crash")
+        response.raise_for_status()
+        data = response.json()
+        crash_points = [point["crashPoint"] for point in data["history"][:20]]
+        return crash_points
     except requests.RequestException as e:
         cprint.error(f"Failed to get crash points: {e}")
         return None
@@ -80,10 +81,19 @@ def train_and_predict(df, model_type='linear', scaler=None, features=None):
     
     return predicted_crash_point
 
-def start(model_type):
+def crash(model_type):
     crash_points = get_points()
     if crash_points:
         df, scaler, features = prepare_data(crash_points)
         prediction = train_and_predict(df, model_type, scaler, features)
         return prediction
     return 1.01
+
+def slides():
+    with requests.Session() as session:
+        with session.post("http://134.255.218.3:1032/slides") as response:
+            if response.status_code == 200:
+                data = response.json()
+                return data.get("a")
+            else:
+                return None

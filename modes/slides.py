@@ -2,8 +2,8 @@ from websocket import WebSocketApp
 import threading
 import json
 from src import cprint
-import random
-import requests
+from functions import balance, predict
+import traceback
 
 class Slides:
     def __init__(self, client, session) -> None:
@@ -48,7 +48,7 @@ class Slides:
                 ws.close()
             else:
                 cprint.info("Slides game is starting...")
-                self.chosen_color = random.choice(["purple", "red"])
+                self.chosen_color = predict.slides()
                 cprint.info(f"Next game prediction: {self.chosen_color}.")
                 ws.send(f'42/rouletteV2,{json.dumps(["join-game", {"color": self.chosen_color, "betAmount": self.client.bet_amt}])}')
 
@@ -64,7 +64,7 @@ class Slides:
                     data = json.loads(msg.replace("42/rouletteV2,", ""))[1]
                     wincolor = data["winningColor"]
 
-                    self.wallet = self.get_wallet()
+                    self.wallet = balance.get(self.session)
 
                     if self.chosen_color != wincolor:
                         cprint.lost(f"Predicted {self.chosen_color} and was {wincolor}..")
@@ -74,18 +74,7 @@ class Slides:
                 else:
                     cprint.info("Did not join this slides game.\n")
             except:
-                import traceback
                 traceback.print_exc()
-
-    def get_wallet(self):
-        with requests.Session() as session:
-            with session.get("https://api.bloxflip.com/user", headers={"x-auth-token": self.client.token}) as response:
-                if response.status_code == 200:
-                    data = response.json()
-                    return data.get("user").get("wallet") + data.get("user").get("bonusWallet")
-                else:
-                    cprint.error(f"Failed to get wallet: {response.status_code}")
-                    return 0
 
     def keep_alive(self, ws, interval):
         while not self.stop_event.is_set():
