@@ -20,7 +20,24 @@ class Slides:
             if self.close_conn:
                 break
             try:
-                wsa = WebSocketApp("wss://ws.bloxflip.com/socket.io/?EIO=3&transport=websocket", header={'Accept-Encoding': 'gzip, deflate, br','Cache-Control': 'no-cache','Connection': 'Upgrade','Pragma': 'no-cache','Upgrade': 'websocket'}, on_open=self.on_open, on_message=self.on_message)
+                headers = {
+                    'Host': 'ws.bloxflip.com',
+                    'Connection': 'Upgrade',
+                    'Pragma': 'no-cache',
+                    'Cache-Control': 'no-cache',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+                    'Upgrade': 'websocket',
+                    'Origin': 'https://bloxflip.com',
+                    'Sec-WebSocket-Version': '13',
+                    'Accept-Encoding': 'gzip, deflate, br, zstd',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                }
+                wsa = WebSocketApp(
+                    "wss://ws.bloxflip.com/socket.io/?EIO=3&transport=websocket",
+                    header=headers,
+                    on_open=self.on_open,
+                    on_message=self.on_message
+                )
                 wsa.run_forever()
             except Exception as e:
                 cprint.error(f"WebSocket connection error: {e}")
