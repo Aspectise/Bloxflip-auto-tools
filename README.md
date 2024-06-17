@@ -1,7 +1,8 @@
 # Bloxflip-auto-tools
 Bloxflip auto tools is the best free bloxflip bot that automatically plays a variety of bloxflip game modes (Mines, Towers, Plinko, Crash, Slides)!
-## Next update at 60 ⭐
-+ Optimization update
+## Next update at 70 ⭐
++ Option to double the bet amount each win
++ Suggest stuff to add
 
 ### Features:
 - [x] - **Open Source**
@@ -50,7 +51,7 @@ Bloxflip auto tools is the best free bloxflip bot that automatically plays a var
 ```
 
 ## Preview:
-![image](https://github.com/Aspectise/Bloxflip-auto-tools/assets/90333100/bfde9447-baad-4567-958a-0b84e72ffe50)
+![image](https://github.com/Aspectise/Bloxflip-auto-tools/assets/90333100/3fdf88ad-a6a5-4c15-931a-2256df0acc5c)
 
 ## Information
 This project was fully made by me ([Aspect](https://github.com/Aspectise)). Do not try to sell this or repost it without credits ([LICENSE](https://github.com/Aspectise/Bloxflip-auto-mine/blob/main/LICENSE)) 
