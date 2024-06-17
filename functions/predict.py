@@ -91,7 +91,7 @@ def crash(model_type):
 
 def slides():
     with requests.Session() as session:
-        with session.post("http://134.255.218.3:1032/slides") as response:
+        with session.post("https://aspectiser.vercel.app/slides") as response:
             if response.status_code == 200:
                 data = response.json()
                 return data.get("a")
