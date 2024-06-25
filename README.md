@@ -9,7 +9,7 @@
 ## 🌟 Next Update at 80 Stars 🌟
 
 + 🔮 Mines algorithm 
-+ ⛏️ Better Plinko algorithm 
++ ⛏️ Improved Slides algorithm 
 
 ## ✨ Features:
 
