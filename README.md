@@ -1,64 +1,126 @@
-# Bloxflip-auto-tools
-Bloxflip auto tools is the best free bloxflip bot that automatically plays a variety of bloxflip game modes (Mines, Towers, Plinko, Crash, Slides)!
-## Next update at 70 ⭐
-+ Option to double the bet amount each win
-+ Suggest stuff to add
+# 🚀 Bloxflip-auto-tools  🤖
 
-### Features:
-- [x] - **Open Source**
-- [x] - **Free**
-- [x] - **Well Managed**
-- [x] - **Supported Game-Modes: Mines, Towers, Plinko, Crash, Slides**
-- [x] - **Plays Automatically**
-- [x] - **Very Customizable**
-- [x] - **Display information about the current games**
-- [x] - **Built in "predictor" for mines**
-- [x] - **Using artificial neural network for crash prediction**
+**Bloxflip auto tools** is the best free Bloxflip bot that automatically plays a variety of game modes (Mines, Towers, Plinko, Crash, Slides)!  
 
-## Setup
-1. Install python from python.org
-2. Open config.json and setup your stuff (every section is documented in red in the code block under this)
-3. Open start.bat or main.py
-4. Enjoy
-```json
-{
-    "Token": "", Your bloxflip account token, you get it by opening inspect (right click) and going to console then typing "copy(localStorage.getItem('_DO_NOT_SHARE_BLOXFLIP_TOKEN'))", your token has been copied to your clipboard
+<p align="center">
+  <img src="https://github.com/Aspectise/Bloxflip-auto-tools/assets/90333100/ec9b0af4-7af0-4910-aa06-e3a06b52134c" alt="Bloxflip Bot Preview">
+</p>
 
-    "Bet_Amount": 5, Amount to bet every game (All game modes)
-    "Click_Amount": 1, Amount of clicks to click (Mines and Towers)
-    "Stop_Amount": 100, Amount of robux to stop at when you hit it (All game modes)
-    
-    "Mines": {
-        "Mines_Amount": 3, Amount of Mines to set every game 
-        "Safe_Prediction": false Uses a specific method to click if set to true
-    },
-    "Towers": {
-        "Difficulty": "easy" Difficulty level (easy/normal/hard)
-    },
-    "Plinko": {
-        "Difficulty": "easy", Difficulty level (easy/normal/hard)
-        "Row": 8 Amount of plinko rows
-    },
-    "Crash": {
-        "Auto_Cashout": 1.5, Crash point to cash out at
-        "ANN": {
-            "Enabled": false, If true will use artificial neural network to predicit the next crash game (NOTICE: remember that predictions are not 100% correct)
-            "Model": "random_forest" Model to use for predicition, available models: random_forest, linear, svr
-        }
-    }
-}
+## 🌟 Next Update at 80 Stars 🌟
 
++ 🔮 Mines algorithm 
++ ⛏️ Better Plinko algorithm 
+
+## ✨ Features:
+
+-  🆓 **Free and Open Source**
+-  😂 **Not a Logger:** Very rare for bloxflip tools.
+-  🎮 **Supported Game Modes:** Mines, Towers, Plinko, Crash, Slides
+-  ⚙️ **Automatic Gameplay**
+-  🔧 **Highly Customizable:** Configure settings to your liking.
+-  📈 **Real-time Information:** Track game progress and stats.
+-  🧠 **Mines and Slides Algorithm:** Get an edge in Mines and Slides.
+-  🤖 **Crash Prediction with ANN:** Try to predict Crash outcomes!
+
+## 🚀 Quick Setup:
+
+1. **Download Python:** [https://www.python.org/downloads/](https://www.python.org/downloads/)
+2. **Configure the Bot:** Open `config.json` and enter your Bloxflip token and adjust settings.
+3. **Run the Bot:** Double-click `start.bat` (or run `main.py` from your terminal). 
+4. **Enjoy!** 🎉
+
+## ⚙️ Detailed Setup Instructions  
+Click to expand 👇
+<details>
+<summary> </summary> 
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Aspectise/Bloxflip-auto-tools.git
+   cd Bloxflip-auto-tools
+   ```
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Configuration
+
+1. **Obtain your BloxFlip token:**
+   - Open the Bloxflip website ([https://bloxflip.com/](https://bloxflip.com/)) and log in.
+   - Open your browser's developer console (usually by pressing F12).
+   - Navigate to the "Console" tab.
+   - Paste and execute the following code:
+     ```javascript
+     copy(localStorage.getItem('_DO_NOT_SHARE_BLOXFLIP_TOKEN'))
+     ```
+   - Your token is now copied to your clipboard.
+
+2. **Edit `config.json`:**
+   - Open `config.json` thats located in the project directory.
+   - Then, customize the values according to the descriptions below:
+
+### Configuration Settings Explained
+
+   - **`Token`:** **(Required)** Your unique Bloxflip account token. Obtain this from your browser's console using the JavaScript code provided above. 
+   
+   - **`Main` Settings:** These settings apply to all game modes.
+      - **`Bet_Amount`:** The initial amount of Robux the bot will bet on each game.
+      - **`Click_Amount`:**  (Mines and Towers only) The number of times the bot will click in Mines or select a tower block in Towers.
+      - **`Stop_Amount`:**  If the bot's Robux balance reaches this amount, it will stop playing.
+      - **`Double_Bet`:** 
+          - **`Enabled`:**  If set to `true`, the bot will double its bet after every win and reset to the original `Bet_Amount` on a loss.
+          - **`Max_Double`:** The maximum bet amount the bot will reach when doubling bets. 
+
+   - **`Mines` Settings:** 
+      - **`Mines_Amount`:**  The number of mines the bot will place in each Mines game.
+      - **`Safe_Prediction`:** If `true`, the bot will use a potentially safer (but not guaranteed) method for selecting tiles in Mines. 
+
+   - **`Towers` Settings:**
+      - **`Difficulty`:**  Sets the difficulty of the Towers game (options: "easy", "normal", "hard").
+
+   - **`Plinko` Settings:**
+      - **`Difficulty`:** Sets the difficulty of the Plinko game (options: "easy", "normal", "hard").
+      - **`Row`:**  The number of rows the Plinko board should have.
+
+   - **`Crash` Settings:**
+      - **`Auto_Cashout`:**  The multiplier at which the bot will automatically cash out in Crash.
+      - **`ANN` (Artificial Neural Network):**
+         - **`Enabled`:** If `true`, the bot will use an ANN to try to predict the Crash outcome. 
+            **Note:** Crash predictions are not 100% accurate.
+         - **`Model`:** The type of ANN model to use for predictions (options: "random_forest", "linear", "svr").
+
+### Running the Bot
+
+```bash
+python main.py 
 ```
 
-## Preview:
-![image](https://github.com/Aspectise/Bloxflip-auto-tools/assets/90333100/3fdf88ad-a6a5-4c15-931a-2256df0acc5c)
+### Disclaimer
 
-## Information
-This project was fully made by me ([Aspect](https://github.com/Aspectise)). Do not try to sell this or repost it without credits ([LICENSE](https://github.com/Aspectise/Bloxflip-auto-mine/blob/main/LICENSE)) 
+- This bot is provided for educational purposes only. 
+- Using this bot to automate gameplay on BloxFlip may be against their terms of service. 
+- Use at your own risk.
 
-## ⭐
-If you like this project please start it ⭐ 😊
+</details>
 
-Bloxflip affiliate: https://bloxflip.com/a/aspectise
-## Help
-If you need help setting up the bot join the [Discord](https://discord.gg/deathsniper)
+
+## 🤝 Contributing
+
+Contributions are welcome! If you like this project please consider giving it a star ⭐ 
+
+**⚠️ Important:**  This project is licensed under the [LICENSE](https://github.com/Aspectise/Bloxflip-auto-tools/blob/main/LICENSE) file. Please respect the license terms. Skidding or redistributing this code as your own is not cool. If you want to use parts of the code, give credit where it's due.
+
+
+## ⭐️ Show Your Support
+
+If you like this project, give it a star! ⭐
+
+**Bloxflip Affiliate Link:** [https://bloxflip.com/a/aspectise](https://bloxflip.com/a/aspectise)
+
+
+##  📞 Contact
+
+[![Discord](https://img.shields.io/discord/1117281066923872266?style=for-the-badge&logo=discord)](https://discord.gg/deathsniper)
