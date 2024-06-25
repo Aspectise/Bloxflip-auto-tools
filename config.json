@@ -1,23 +1,32 @@
 {
     "Token": "",
     
-    "Bet_Amount": 5,
-    "Click_Amount": 1,
-    "Stop_Amount": 100,
+    "Main": {
+        "Bet_Amount": 5,
+        "Click_Amount": 1,
+        "Stop_Amount": 1000,
+        "Double_Bet": {
+            "Enabled": false,
+            "Max_Double": 100
+        }
+    },
     
     "Mines": {
-        "Mines_Amount": 3,
+        "Mines_Amount": 1,
         "Safe_Prediction": false
     },
+    
     "Towers": {
         "Difficulty": "easy"
     },
+    
     "Plinko": {
         "Difficulty": "easy",
-        "Row": 8
+        "Row": 16
     },
+    
     "Crash": {
-        "Auto_Cashout": 1.5,
+        "Auto_Cashout": 2,
         "ANN": {
             "Enabled": false,
             "Model": "random_forest"
