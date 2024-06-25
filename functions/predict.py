@@ -11,10 +11,9 @@ import warnings
 from src import cprint
 warnings.filterwarnings("ignore") 
 
-def get_points():
+def get_points(session):
     try:
-        scraper = cloudscraper.CloudScraper()
-        response = scraper.get("https://api.bloxflip.com/games/crash")
+        response = session.get("https://api.bloxflip.com/games/crash")
         response.raise_for_status()
         data = response.json()
         crash_points = [point["crashPoint"] for point in data["history"][:20]]
@@ -81,8 +80,8 @@ def train_and_predict(df, model_type='linear', scaler=None, features=None):
     
     return predicted_crash_point
 
-def crash(model_type):
-    crash_points = get_points()
+def crash(model_type, session):
+    crash_points = get_points(session)
     if crash_points:
         df, scaler, features = prepare_data(crash_points)
         prediction = train_and_predict(df, model_type, scaler, features)
