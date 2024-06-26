@@ -35,13 +35,23 @@ Click to expand 👇
 <summary> </summary> 
 
 ### Installation
+1. **Install python:**
+   This project is powered by Python.  Make sure you have it installed:
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Aspectise/Bloxflip-auto-tools.git
-   cd Bloxflip-auto-tools
-   ```
-2. **Install dependencies:**
+   - **Download:** Head to [https://www.python.org/downloads/](https://www.python.org/downloads/) and grab the latest version.
+   - **Installation:** Run the installer and **check the "Add Python to PATH" box** during setup.
+3. **Clone/Download the repository:**
+   Choose your preferred method to get the project files:
+
+   - **Git Clone (Recommended for Developers):**
+     ```bash
+     git clone https://github.com/Aspectise/Bloxflip-auto-tools.git
+     cd Bloxflip-auto-tools
+     ```
+
+   - **Direct Download (ZIP Archive):**
+     [Download](https://github.com/Aspectise/Bloxflip-auto-tools/archive/refs/heads/main.zip) and extract the contents to your desired location.
+5. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
