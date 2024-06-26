@@ -3,6 +3,13 @@
 **Bloxflip auto tools** is the best free Bloxflip bot that automatically plays a variety of game modes (Mines, Towers, Plinko, Crash, Slides)!  
 
 <p align="center">
+  <a href="https://github.com/Aspectise/Bloxflip-auto-tools/issues"><img alt="Issues" src="https://img.shields.io/github/issues/Aspectise/Bloxflip-auto-tools?style=for-the-badge"></a>
+  <a href="https://github.com/Aspectise/Bloxflip-auto-tools/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Aspectise/Bloxflip-auto-tools?style=for-the-badge"></a>
+  <a href="https://github.com/Aspectise/Bloxflip-auto-tools/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/Aspectise/Bloxflip-auto-tools?style=for-the-badge"></a>
+  <a href="https://github.com/Aspectise/Bloxflip-auto-tools/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Aspectise/Bloxflip-auto-tools?style=for-the-badge"></a>
+</p>
+
+<p align="center">
   <img src="https://github.com/Aspectise/Bloxflip-auto-tools/assets/90333100/ec9b0af4-7af0-4910-aa06-e3a06b52134c" alt="Bloxflip Bot Preview">
 </p>
 
@@ -50,12 +57,14 @@ Click to expand 👇
      ```
 
    - **Direct Download (ZIP Archive):**
-     [Download](https://github.com/Aspectise/Bloxflip-auto-tools/archive/refs/heads/main.zip) and extract the contents to your desired location.
+     [Download](https://github.com/Aspectise/Bloxflip-auto-tools/archive/refs/heads/main.zip) and **extract** the contents to your desired location.
 5. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
+   - **Open a terminal in the repository folder then paste this:**
+     ```bash
+     pip install -r requirements.txt
+     ```
+     
+   - **Open `start.bat`.**
 ### Configuration
 
 1. **Obtain your BloxFlip token:**
