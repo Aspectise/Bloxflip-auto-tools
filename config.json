@@ -4,9 +4,10 @@
     "Main": {
         "Bet_Amount": 5,
         "Click_Amount": 1,
-        "Stop_Amount": 1000,
+        "Stop_Amount": 100,
         "Double_Bet": {
             "Enabled": false,
+            "On_Loss": false,
             "Max_Double": 100
         }
     },
@@ -17,12 +18,17 @@
     },
     
     "Towers": {
-        "Difficulty": "easy"
+        "Difficulty": "easy",
+        "Algorithm": "last_game"
     },
     
     "Plinko": {
         "Difficulty": "easy",
         "Row": 16
+    },
+    
+    "Slides": {
+        "Opposite_Color": false
     },
     
     "Crash": {
