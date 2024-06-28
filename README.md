@@ -13,9 +13,8 @@
   <img src="https://github.com/Aspectise/Bloxflip-auto-tools/assets/90333100/ec9b0af4-7af0-4910-aa06-e3a06b52134c" alt="Bloxflip Bot Preview">
 </p>
 
-## 🌟 Next Update at 80 Stars 🌟
+## 🌟 Next Update at 85 Stars 🌟
 
-+ 🔮 Mines algorithm 
 + ⛏️ Improved Slides algorithm 
 
 ## ✨ Features:
@@ -35,6 +34,10 @@
 2. **Configure the Bot:** Open `config.json` and enter your Bloxflip token and adjust settings.
 3. **Run the Bot:** Double-click `start.bat` (or run `main.py` from your terminal). 
 4. **Enjoy!** 🎉
+
+## 📺 Video Setup:
+
+- https://www.youtube.com/watch?v=PAynRn7K4hw
 
 ## ⚙️ Detailed Setup Instructions  
 Click to expand 👇
@@ -91,11 +94,12 @@ Click to expand 👇
       - **`Stop_Amount`:**  If the bot's Robux balance reaches this amount, it will stop playing.
       - **`Double_Bet`:** 
           - **`Enabled`:**  If set to `true`, the bot will double its bet after every win and reset to the original `Bet_Amount` on a loss.
+          - **`On_Loss`:**  If set to `true`, the bot will double its bet after every lost and reset to the original `Bet_Amount` on a win.
           - **`Max_Double`:** The maximum bet amount the bot will reach when doubling bets. 
 
    - **`Mines` Settings:** 
       - **`Mines_Amount`:**  The number of mines the bot will place in each Mines game.
-      - **`Safe_Prediction`:** If `true`, the bot will use a potentially safer (but not guaranteed) method for selecting tiles in Mines. 
+      - **`Algorithm`:** The algorithm to use for predictions (options: "random", "safe", "last_game").
 
    - **`Towers` Settings:**
       - **`Difficulty`:**  Sets the difficulty of the Towers game (options: "easy", "normal", "hard").
@@ -103,6 +107,9 @@ Click to expand 👇
    - **`Plinko` Settings:**
       - **`Difficulty`:** Sets the difficulty of the Plinko game (options: "easy", "normal", "hard").
       - **`Row`:**  The number of rows the Plinko board should have.
+
+   - **`Slides` Settings:**
+      - **`Opposite_Color`:** If set to `true`, the bot will chose the opposite color of the last slides game.
 
    - **`Crash` Settings:**
       - **`Auto_Cashout`:**  The multiplier at which the bot will automatically cash out in Crash.
