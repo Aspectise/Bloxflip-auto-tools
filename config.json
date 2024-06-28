@@ -14,12 +14,11 @@
     
     "Mines": {
         "Mines_Amount": 1,
-        "Safe_Prediction": false
+        "Algorithm": "last_game"
     },
     
     "Towers": {
-        "Difficulty": "easy",
-        "Algorithm": "last_game"
+        "Difficulty": "easy"
     },
     
     "Plinko": {
