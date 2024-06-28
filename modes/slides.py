@@ -9,10 +9,12 @@ class Slides:
         self.client = client
         self.joined_game = False
         self.close_conn = False
+        self.lost = False
         self.game_played = 0
         self.bet_amount = self.client.bet_amt
         self.session = session
         self.wallet = None
+        self.prev_color = None
         self.data = {}
         self.stop_event = threading.Event()
 
@@ -71,7 +73,10 @@ class Slides:
                 ws.close()
             else:
                 cprint.info("Slides game is starting...")
-                self.chosen_color = predict.slides()
+                if self.client.op_color and self.prev_color is not None:
+                    self.chosen_color = "purple" if self.prev_color == "red" else "red" if self.prev_color == "purple" else None
+                else:
+                    self.chosen_color = predict.slides()
                 cprint.info(f"Next game prediction: {self.chosen_color}.")
                 ws.send(f'42/rouletteV2,{json.dumps(["join-game", {"color": self.chosen_color, "betAmount": self.bet_amount}])}')
 
@@ -79,18 +84,18 @@ class Slides:
             cprint.success(f"Joined the current slides game on {self.chosen_color}!")
             self.game_played += 1
             self.joined_game = True
+            self.lost = False
 
         if "game-rolled" in msg:
             cprint.info("Slides game ended.")
+            data = json.loads(msg.replace("42/rouletteV2,", ""))[1]
+            wincolor= data["winningColor"]
+            self.prev_color = wincolor.lower()
             if self.joined_game:
-                data = json.loads(msg.replace("42/rouletteV2,", ""))[1]
-                wincolor = data["winningColor"]
-
                 self.wallet = balance.get(self.session)
 
                 if self.chosen_color != wincolor:
-                    if self.client.if_double:
-                        self.bet_amount = self.client.bet_amt
+                    self.lost = True
                     cprint.info(f"  - Win color: {wincolor}")
                     cprint.lost(f"   - Prediction: {self.chosen_color}\n")
                 else:
@@ -100,7 +105,9 @@ class Slides:
                     cprint.info(f"  - Win color: {wincolor}")
                     cprint.info(f"  - Prediction: {self.chosen_color}")
                     cprint.won(f"   - Gained: {gained:.2f} R$\n")
-                    if self.client.if_double:
+
+                if self.client.if_double:
+                    if self.lost and self.client.on_loss or not self.lost and not self.client.on_loss:
                         self.bet_amount = min(self.bet_amount * 2, self.client.max_double)
                         if self.bet_amount > self.wallet:
                             cprint.error("Double bet exceeds your balance. Cannot continue.")
@@ -108,6 +115,10 @@ class Slides:
                             self.close_conn = True
                             self.stop_event.set()
                             ws.close()
+                        cprint.info(f"Doubling bet amount to {self.bet_amount} R$!")
+                    else:
+                        self.bet_amount = self.client.bet_amt
+                        cprint.info(f"Resetting bet amount to {self.bet_amount} R$.")
             else:
                 cprint.info("Did not join this slides game.\n")
 

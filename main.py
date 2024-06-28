@@ -10,7 +10,6 @@ class Main:
     def __init__(self):
         settings.load_settings(self)
         cprint.header(1)
-        self.version = "6.1"
         self.token = self.settings.get("Token")
         if not self.token:
             cprint.error("Token not found. Please add your token in the config file.")
@@ -21,7 +20,8 @@ class Main:
 
         cprint.info("Checking Token...")
         self.wallet, self.username, self.user_id = self.verify_token(self.session)
-        cprint.info(f"Logged in as {self.username} / Balance: {self.wallet:.2f} R$\n")
+        cprint.info(f"Logged in as {self.username} | Balance: {self.wallet:.2f} R$\n")
+        time.sleep(1)
 
     def verify_token(self, session):
         response = session.get("https://api.bloxflip.com/user")
@@ -60,6 +60,7 @@ class Main:
 
                 self.lost_streak = 0
                 self.win_streak = 0
+                self.mines_lg = None
 
                 self.game_mode = {'01': "mines", '02': "towers", '03': "plinko", '04': "crash", '05': "slides", '06': "settings"}.get(f"{choice:02d}")
                 if self.game_mode == "settings":

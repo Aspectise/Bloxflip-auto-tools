@@ -16,89 +16,146 @@ def print_settings(settings_data, indent=2, prefix="", is_last_section=False):
             else:
                 cprint.info(f"{' ' * indent}{prefix}{Color(153, 204, 255)}{key}{Color(255, 255, 255)}: {Color(204, 255, 204)}{value}{Color(255, 255, 255)}")
 
+
+
 def change_settings(self):
-    while True:
-        cprint.header(1)
-        cprint.info("Current Settings:")
-        print_settings(self.settings)
+        setting_schema = {
+            "Main": {
+                "Bet_Amount": (int, float),
+                "Click_Amount": int,
+                "Stop_Amount": int,
+                "Double_Bet": {
+                    "Enabled": bool,
+                    "On_Loss": bool,
+                    "Max_Double": (int, float)
+                }
+            },
+            "Mines": {
+                "Mines_Amount": int,
+                "Algorithm": ["last_game", "safe", "random"]
+            },
+            "Towers": {
+                "Difficulty": ["easy", "normal", "hard"]
+            },
+            "Plinko": {
+                "Difficulty": ["easy", "normal", "hard"],
+                "Row": int
+            },
+            "Slides": {
+                "Opposite_Color": bool
+            },
+            "Crash": {
+                "Auto_Cashout": (int, float),
+                "ANN": {
+                    "Enabled": bool,
+                    "Model": ["random_forest", "linear", "svr"]
+                }
+            }
+        }    
 
-        print("\n")
-        cprint.info("Information:")
-        cprint.info("  - Enter the full setting path to change (e.g., 'Mines.Mines_Amount', 'Crash.ANN.Enabled')")
-        cprint.info("  - Type 'back' to return to the main menu.\n")
+        while True:
+            cprint.header(1)
+            cprint.info("Current Settings:")
+            print_settings(self.settings)
 
-        choice = input(f"{Color(0x20278C)}[{Color(255, 255, 255)}Settings{Color(0x20278C)}]{Color(255, 255, 255)}$ ")
-        if choice.lower() == 'back':
-            break
+            print("\n")
+            cprint.info("Information:")
+            cprint.info("  - Enter the full setting path to change (e.g., 'Mines.Mines_Amount', 'Crash.ANN.Enabled')")
+            cprint.info("  - Type 'back' to return to the main menu.\n")
 
-        keys = [key.lower() for key in choice.split('.')]
-
-        current_setting = self.settings
-        for key in keys[:-1]:
-            if key in [k.lower() for k in current_setting.keys()]:
-                current_setting = current_setting[[k for k in current_setting.keys() if k.lower() == key][0]]
-            else:
-                cprint.error(f"Invalid setting path: '{choice}'")
-                time.sleep(1)
+            choice = input(f"{Color(0x20278C)}[{Color(255, 255, 255)}Settings{Color(0x20278C)}]{Color(255, 255, 255)}$ ")
+            if choice.lower() == 'back':
                 break
 
-        last_key = keys[-1]
-        if isinstance(current_setting, dict) and last_key in [k.lower() for k in current_setting.keys()]:
+            keys = choice.split(".")
+            current_level = self.settings
+            schema_level = setting_schema
+
             try:
-                new_value = cprint.user_input(f"Enter new value for '{choice}': ")
-                actual_key = [k for k in current_setting.keys() if k.lower() == last_key][0]
+                for i, key in enumerate(keys):
+                    matching_key = next((k for k in current_level.keys() if k.lower() == key.lower()), None)
+                    if matching_key is None:
+                        raise ValueError(f"Invalid setting path: '{choice}'")
 
-                if choice.lower() in ["main.bet_amount", "crash.auto_cashout"]: 
-                    try:
-                        new_value = int(new_value)
-                    except ValueError:
-                        new_value = float(new_value)
-                elif choice.lower() in ["main.click_amount", "main.stop_amount", "mines.mines_amount", "plinko.row", "main.double_bet.max_double"]:
-                    new_value = int(new_value)
-                elif choice.lower() in ["towers.difficulty", "plinko.difficulty"]:
-                    if new_value.lower() not in ["easy", "normal", "hard"]:
-                        raise ValueError("Difficulty must be 'easy', 'normal', or 'hard'")
-                    new_value = new_value.lower()
-                elif choice.lower() == "crash.ann.model":
-                    if new_value.lower() not in ["random_forest", "linear", "svr"]:
-                        raise ValueError("Model must be 'random_forest', 'linear', or 'svr'")
-                    new_value = new_value.lower()
-                elif choice.lower() in ["main.double_bet.enabled", "mines.safe_prediction", "crash.ann.enabled"]:
-                    if new_value.lower() not in ["true", "false"]:
-                        raise ValueError("Value must be 'true' or 'false'")
-                    new_value = new_value.lower() == "true"
-                else:
-                    raise ValueError("Invalid setting path.")
+                    if i == len(keys) - 1:
+                        new_value = cprint.user_input(f"Enter new value for '{choice}': ")
+                        expected_type = schema_level[matching_key]
 
-                current_setting[actual_key] = new_value
-                with open("config.json", "w") as f:
-                    json.dump(self.settings, f, indent=4)
-                load_settings(self) 
-                cprint.success(f"Setting '{choice}' updated successfully!")
+                        if isinstance(expected_type, tuple):
+                            if isinstance(expected_type[0], type) and all(isinstance(t, type) for t in expected_type):
+                                valid_input = False
+                                for t in expected_type:
+                                    try:
+                                        new_value = t(new_value)
+                                        valid_input = True
+                                        break
+                                    except ValueError:
+                                        pass
 
+                                if not valid_input:
+                                    if int in expected_type and float in expected_type:
+                                        raise ValueError(f"Please enter a number.")
+                                    else:
+                                        raise ValueError(f"Expected one of: {', '.join([t.__name__ for t in expected_type])}")
+
+                        elif expected_type is bool:
+                            if new_value.lower() in ["true"]:
+                                new_value = True
+                            elif new_value.lower() in ["false"]:
+                                new_value = False
+                            else:
+                                raise ValueError(f"Please enter 'true' or 'false'.")
+                        elif isinstance(expected_type, list):
+                            if new_value.lower() not in [v.lower() for v in expected_type]:
+                                raise ValueError(f"Value must be one of: {', '.join(expected_type)}")
+                        else:
+                            try:
+                                new_value = expected_type(new_value)
+                            except ValueError:
+                                if expected_type is int:
+                                    raise ValueError("Please enter a number.")
+                                else:
+                                    raise ValueError(f"Please enter a value of type {expected_type.__name__}.") 
+
+                        current_level[matching_key] = new_value
+                        with open("config.json", "w") as f:
+                            json.dump(self.settings, f, indent=4)
+                        load_settings(self)
+                        cprint.success(f"Setting '{choice}' updated successfully!")
+                        break
+                    else:
+                        current_level = current_level[matching_key]
+                        schema_level = schema_level[matching_key]
             except ValueError as e:
-                cprint.error(f"Invalid input: {e}")
+                cprint.error(e)
             except Exception as e:
                 cprint.error(f"An error occurred: {e}")
-        else:
-            cprint.error(f"Invalid setting path: '{choice}'")
-        time.sleep(1.5)
+            time.sleep(1.5)
 
 def setup(self):
-    self.bet_amt = self.settings.get("Main").get("Bet_Amount")
-    self.click_amt = self.settings.get("Main").get("Click_Amount")
-    self.stop_amt = self.settings.get("Main").get("Stop_Amount")
-    self.if_double = self.settings.get("Main").get("Double_Bet").get("Enabled")
-    self.max_double = self.settings.get("Main").get("Double_Bet").get("Max_Double")
-    self.difficulty = self.settings.get("Towers").get("Difficulty")
-    self.difficulty = self.difficulty.lower()
-    self.bomb_amt = self.settings.get("Mines").get("Mines_Amount")
-    self.safe_pred = self.settings.get("Mines").get("Safe_Prediction")
-    self.plinko_difficulty = self.settings.get("Plinko").get("Difficulty")
-    self.plinko_row = self.settings.get("Plinko").get("Row")
-    self.auto_cashout = self.settings.get("Crash").get("Auto_Cashout")
-    self.crash_model = self.settings.get("Crash").get("ANN").get("Model").lower()
-    self.ann_enabled = self.settings.get("Crash").get("ANN").get("Enabled")
+    settings_main = self.settings.get("Main")
+    settings_towers = self.settings.get("Towers")
+    settings_mines = self.settings.get("Mines")
+    settings_plinko = self.settings.get("Plinko")
+    settings_slides = self.settings.get("Slides")
+    settings_crash = self.settings.get("Crash")
+    settings_ann = settings_crash.get("ANN")
+
+    self.bet_amt = settings_main.get("Bet_Amount")
+    self.click_amt = settings_main.get("Click_Amount")
+    self.stop_amt = settings_main.get("Stop_Amount")
+    self.if_double = settings_main.get("Double_Bet").get("Enabled")
+    self.max_double = settings_main.get("Double_Bet").get("Max_Double") 
+    self.on_loss = settings_main.get("Double_Bet").get("On_Loss") 
+    self.difficulty = settings_towers.get("Difficulty").lower()
+    self.bomb_amt = settings_mines.get("Mines_Amount")
+    self.mines_algo = settings_mines.get("Algorithm").lower()
+    self.op_color = settings_slides.get("Opposite_Color")
+    self.plinko_difficulty = settings_plinko.get("Difficulty").lower()
+    self.plinko_row = settings_plinko.get("Row")
+    self.auto_cashout = settings_crash.get("Auto_Cashout")
+    self.crash_model = settings_ann.get("Model").lower()
+    self.ann_enabled = settings_ann.get("Enabled")
 
     error_messages = []
     for setting, value in [

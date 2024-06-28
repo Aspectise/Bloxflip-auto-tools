@@ -9,6 +9,7 @@ class Crash:
         self.client = client
         self.joined_game = False
         self.close_conn = False
+        self.lost = False
         self.game_played = 0
         self.bet_amount = self.client.bet_amt
         self.wallet = None
@@ -86,6 +87,7 @@ class Crash:
             cprint.success(f"Joined the current crash game on {self.cashout_point}x!")
             self.game_played += 1
             self.joined_game = True
+            self.lost = False
 
         if "bet-cashout" in msg:
             data = json.loads(msg.replace("42/crash,", ""))[1]
@@ -98,8 +100,7 @@ class Crash:
                 data = json.loads(msg.replace("42/crash,", ""))[1]
                 self.wallet = balance.get(self.session)
                 if data.get("crashPoint") < self.cashout_point:
-                    if self.client.if_double:
-                        self.bet_amount = self.client.bet_amt
+                    self.lost = True
                     cprint.info(f"  - Crashed at: {data.get('crashPoint')}x")
                     cprint.lost(f"   - Was going for: {self.cashout_point}x\n")
                 else:
@@ -109,7 +110,9 @@ class Crash:
                     cprint.info(f"  - Crashed at: {data.get('crashPoint')}x")
                     cprint.info(f"  - Cashed out at: {self.cashout_point}x")
                     cprint.won(f"   - Gained: {gained:.2f} R$\n")
-                    if self.client.if_double:
+
+                if self.client.if_double:
+                    if self.lost and self.client.on_loss or not self.lost and not self.client.on_loss:
                         self.bet_amount = min(self.bet_amount * 2, self.client.max_double)
                         if self.bet_amount > self.wallet:
                             cprint.error("Double bet exceeds your balance. Cannot continue.")
@@ -117,6 +120,10 @@ class Crash:
                             self.close_conn = True
                             self.stop_event.set()
                             ws.close()
+                        cprint.info(f"Doubling bet amount to {self.bet_amount} R$!")
+                    else:
+                        self.bet_amount = self.client.bet_amt
+                        cprint.info(f"Resetting bet amount to {self.bet_amount} R$.")
             else:
                 cprint.info("Did not join this crash game.\n")
 

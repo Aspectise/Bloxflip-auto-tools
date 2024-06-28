@@ -1,6 +1,7 @@
 from rgbprint import Color, rgbprint
 from datetime import datetime
 import os
+import ctypes
 import shutil
 
 def info(text):
@@ -38,7 +39,8 @@ def custom(text, tag, color):
 
 def header(banner=None):
     os.system('cls' if os.name == 'nt' else 'clear')
-    VERSION = 6.1
+    if os.name == "nt":ctypes.windll.kernel32.SetConsoleTitleW("Bloxflip-Auto-Tools | made by Aspectise")
+    VERSION = 7.5
     MAIN_COLOR: Color = Color(0xFDA81A)
     ACCENT_COLOR: Color = Color(255, 255, 255)
 
