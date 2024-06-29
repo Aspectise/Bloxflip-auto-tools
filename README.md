@@ -14,7 +14,7 @@
 </p>
 
 ## 🌟 Next Update at 85 Stars 🌟
-
++ 🔮 Another Mines algorithm
 + ⛏️ Improved Slides algorithm 
 
 ## ✨ Features:
