@@ -1,3 +1,5 @@
+# ❗ Bloxflip has shutdown, this tool is no longer working.
+
 # 🚀 Bloxflip-auto-tools  🤖
 
 **Bloxflip auto tools** is the best free Bloxflip bot that automatically plays a variety of game modes (Mines, Towers, Plinko, Crash, Slides)!  
